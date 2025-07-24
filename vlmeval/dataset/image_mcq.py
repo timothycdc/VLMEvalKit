@@ -2681,13 +2681,13 @@ class TreeBench(ImageMCQDataset):
         return calculate_average_iou(all_boxes, target_boxes)
 
 class CVQA(ImageMCQDataset):
-    
     @classmethod
     def supported_datasets(cls):
         return ['CVQA']
 
+
     DATASET_URL = {"CVQA": "https://huggingface.co/datasets/timothycdc/VLMEvalKit_CVQA_GT/resolve/main/CVQA.tsv",}
-    DATASET_MD5 = {"CVQA": "0e8edf0de3964c4a599a247005839240"}
+    DATASET_MD5 = {"CVQA": "b51dcf2820cb292aa5cb3430dd7d5049"}
 
     SYSPROMPT = (
                 'Select the best answer to the above multiple-choice question based on the image. ' 

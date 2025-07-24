@@ -725,6 +725,10 @@ llava_series = {
     ),
 }
 
+maya_series = {
+    "maya" : partial(Maya,model_path="maya-multimodal/maya",model_base= "CohereForAI/aya-23-8B")
+}
+
 vita_series = {
     "vita": partial(VITA, model_path="VITA-MLLM/VITA", root=VITA_ROOT),
     "vita_qwen2": partial(VITAQwen2, model_path="VITA-MLLM/VITA-1.5", root=VITA_ROOT),
@@ -1528,7 +1532,7 @@ model_groups = [
     aria_series, smolvlm_series, sail_series, valley_series, vita_series,
     ross_series, emu_series, ola_series, ursa_series, gemma_series,
     long_vita_series, ristretto_series, kimi_series, aguvis_series, hawkvl_series, 
-    flash_vl, kimi_vllm_series, oryx_series, treevgr_series
+    flash_vl, kimi_vllm_series, oryx_series, treevgr_series, maya_series
 ]
 
 for grp in model_groups:

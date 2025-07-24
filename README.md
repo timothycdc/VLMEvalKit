@@ -11,6 +11,15 @@
 5. Test the dataset:
   - `python run.py --data CVQA --model maya`
 
+> [!NOTE]
+>  In order for the code to run on my GPU, I have commented out `cuda()` in `VLMEvalKit/vlmeval/vlm/maya/maya.py` on line 102-103:
+>
+>   ```python
+>   # Need to comment out in order for it to run on my machine
+>   self.model = self.model#.cuda()
+>   ```
+> <br>
+        
 
 
 ---
