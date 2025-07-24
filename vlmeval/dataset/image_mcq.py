@@ -2679,3 +2679,14 @@ class TreeBench(ImageMCQDataset):
             return total_iou / num_targets
 
         return calculate_average_iou(all_boxes, target_boxes)
+
+class CVQA(ImageMCQDataset):
+
+    DATASET_URL = {"CVQA": "https://huggingface.co/datasets/timothycdc/VLMEvalKit_CVQA_GT/resolve/main/cvqa_test.tsv",}
+    DATASET_MD5 = {"CVQA": "0e8edf0de3964c4a599a247005839240"}
+
+    SYSPROMPT = (
+                'Select the best answer to the above multiple-choice question based on the image. ' 
+                 'Respond with only the number of the correct answer (A, B, C, or D) of the correct option. \n'
+                 'The best answser is:'
+    )

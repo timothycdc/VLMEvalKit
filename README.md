@@ -1,3 +1,20 @@
+# VLMEvalKit + Maya + CVQA
+## Setup:
+1. Set up a `.env` file with `OPENAI_API_KEY=sk-proj___` to use LLM as a judge. This is recommended 
+2. `cd maya` , follow instructions in the readme to create a virtual environment and install `maya` with `pip`. 
+3. `cd ..` back into the project root, run `pip install -e .` to install VLMEvalKit
+  - Note: you can use the same venv as Maya – I have manually set `numpy<2` in the `requirements.txt` of this VLMEvalKit repo, since my machine does not support multiple virtual environments
+  - Maya was compiled using numpy v1, but VLMEvalKit uses numpy v2.
+4. To download the Maya model: 
+  - If `huggingface-cli` is not installed, install with `pip install -U "huggingface_hub[cli]"`
+  - Run `huggingface-cli login` and paste in your access token
+5. Test the dataset:
+  - `python run.py --data CVQA --model maya`
+
+
+
+---
+
 ![LOGO](http://opencompass.openxlab.space/utils/MMLB.jpg)
 
 <b>A Toolkit for Evaluating Large Vision-Language Models. </b>
