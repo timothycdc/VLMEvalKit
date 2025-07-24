@@ -2686,7 +2686,7 @@ class CVQA(ImageMCQDataset):
     def supported_datasets(cls):
         return ['CVQA']
 
-    DATASET_URL = {"CVQA": "https://huggingface.co/datasets/timothycdc/VLMEvalKit_CVQA_GT/resolve/main/cvqa_test.tsv",}
+    DATASET_URL = {"CVQA": "https://huggingface.co/datasets/timothycdc/VLMEvalKit_CVQA_GT/resolve/main/CVQA.tsv",}
     DATASET_MD5 = {"CVQA": "0e8edf0de3964c4a599a247005839240"}
 
     SYSPROMPT = (
