@@ -4,7 +4,7 @@
 2. `cd maya` , follow instructions in the readme to create a virtual environment and install `maya` with `pip`. 
 3. `cd ..` back into the project root, run `pip install -e .` to install VLMEvalKit
   - Note: you can use the same venv as Maya – I have manually set `numpy<2` in the `requirements.txt` of this VLMEvalKit repo, since my machine does not support multiple virtual environments
-  - Maya was compiled using numpy v1, but VLMEvalKit uses numpy v2.
+  - Maya was compiled using numpy v1, but VLMEvalKit uses numpy v2. From my experience, VLMEvalKit with v1 numpy seems to run without problems.
 4. To download the Maya model: 
   - If `huggingface-cli` is not installed, install with `pip install -U "huggingface_hub[cli]"`
   - Run `huggingface-cli login` and paste in your access token
