@@ -99,8 +99,7 @@ class Maya(BaseModel):
             logging.critical("Unknown error when loading Maya model.")
             raise err
         
-        # Need to comment out in order for it to run on my machine
-        self.model = self.model#.cuda()
+        self.model = self.model.cuda()
         self.conv_mode = "aya"
 
         kwargs_default = dict(
@@ -119,7 +118,7 @@ class Maya(BaseModel):
 
     def use_custom_prompt(self, dataset):
         assert dataset is not None
-        if DATASET_TYPE(dataset) == "MCQ":
+        if DATASET_TYPE(dataset) in ["MCQ", "VQA"]:
             return True
         return False
 
@@ -239,7 +238,15 @@ class Maya(BaseModel):
         else:
             image_tensor = None
 
-        prompt = self.system_prompt + "USER: " + content + " ASSISTANT: "
+        # Correct prompt format for Aya-23
+        # Ref: https://huggingface.co/CohereLabs/aya-23-8B
+        bos_token = self.tokenizer.bos_token
+        user_prompt = content
+        
+        prompt = (
+            f"{bos_token}<|START_OF_TURN_TOKEN|><|USER_TOKEN|>{user_prompt}"
+            "<|END_OF_TURN_TOKEN|><|START_OF_TURN_TOKEN|><|CHATBOT_TOKEN|>"
+        )
 
         input_ids = (
             tokenizer_image_token(

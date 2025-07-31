@@ -1,6 +1,8 @@
-# VLMEvalKit + Maya + CVQA
+# VLMEvalKit + Maya + CVQA + AyaVisionBench
 ## Setup:
-1. Set up a `.env` file with `OPENAI_API_KEY=sk-proj___` to use LLM as a judge. This is recommended 
+1. Setup the env keys:
+  - **For CVQA:** GPT not needed since it is MCQ. If you want to save credit, ensure `.env` file is empty when you run the CVQA dataset, and VLMEvalKit will fall back to exact matching.
+  - **For AyaVisionBench:** Set up a `.env` file with `OPENAI_API_KEY=sk-proj___` to use LLM as a judge. We use gpt-4.1 for now– and I can add support for other LLMs later.
 2. `cd maya` , follow instructions in the readme to create a virtual environment and install `maya` with `pip`. 
 3. `cd ..` back into the project root, run `pip install -e .` to install VLMEvalKit
   - Note: you can use the same venv as Maya – I have manually set `numpy<2` in the `requirements.txt` of this VLMEvalKit repo, since my machine does not support multiple virtual environments
@@ -8,11 +10,14 @@
 4. To download the Maya model: 
   - If `huggingface-cli` is not installed, install with `pip install -U "huggingface_hub[cli]"`
   - Run `huggingface-cli login` and paste in your access token
-5. Test the dataset:
-  - `python run.py --data CVQA --model maya`
+5. Test the dataset. Examples include:
+  - `python run.py --data CVQA_EN --model "llava_v1.5_7b"`
+  - `python run.py --data CVQA_LOC --model maya`
+  - `python run.py --data AyaVisionBench --model maya`
+  - Note: LOC versions should be used for multilingual LLMs, and EN versions for English-only LLMs.
 
 > [!NOTE]
->  In order for the code to run on my GPU, I have commented out `cuda()` in `VLMEvalKit/vlmeval/vlm/maya/maya.py` on line 102-103:
+>  To run on T4 GPU, comment out `cuda()` in `VLMEvalKit/vlmeval/vlm/maya/maya.py` on line 102-103:
 >
 >   ```python
 >   # Need to comment out in order for it to run on my machine
