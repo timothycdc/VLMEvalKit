@@ -16,13 +16,15 @@ def apply_delta(base_model_path, target_model_path, delta_path):
         base_model_path, torch_dtype=torch.float16, low_cpu_mem_usage=True)
 
     print("Loading delta")
-    delta = LlavaLlamaForCausalLM.from_pretrained(delta_path, torch_dtype=torch.float16, low_cpu_mem_usage=True)
+    delta = LlavaLlamaForCausalLM.from_pretrained(
+        delta_path, torch_dtype=torch.float16, low_cpu_mem_usage=True)
     delta_tokenizer = AutoTokenizer.from_pretrained(delta_path)
 
     print("Applying delta")
     for name, param in tqdm(delta.state_dict().items(), desc="Applying delta"):
         if name not in base.state_dict():
-            assert name in ['model.mm_projector.weight', 'model.mm_projector.bias'], f'{name} not in base model'
+            assert name in ['model.mm_projector.weight',
+                            'model.mm_projector.bias'], f'{name} not in base model'
             continue
         if param.data.shape == base.state_dict()[name].shape:
             param.data += base.state_dict()[name]

@@ -34,4 +34,3 @@ cd "$PROJECT_ROOT/llava/eval/maya"
 
 python "$MME_CALCULATE_PY" \
     --results_dir "../../../playground/data/eval/MME/eval_tool/answers/maya_full_ft"
-

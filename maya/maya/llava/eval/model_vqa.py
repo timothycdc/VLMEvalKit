@@ -33,11 +33,14 @@ def eval_model(args):
     model_path = os.path.expanduser(args.model_path)
     model_name = get_model_name_from_path(model_path)
     if 'maya' not in model_name:
-        tokenizer, model, image_processor, context_len = load_pretrained_model(model_path, args.model_base, model_name)
+        tokenizer, model, image_processor, context_len = load_pretrained_model(
+            model_path, args.model_base, model_name)
     else:
-        model, tokenizer, image_processor, context_len = load_maya_model(args.model_base, model_path, mode = args.mode)
+        model, tokenizer, image_processor, context_len = load_maya_model(
+            args.model_base, model_path, mode=args.mode)
 
-    questions = [json.loads(q) for q in open(os.path.expanduser(args.question_file), "r")]
+    questions = [json.loads(q) for q in open(
+        os.path.expanduser(args.question_file), "r")]
     questions = get_chunk(questions, args.num_chunks, args.chunk_idx)
     answers_file = os.path.expanduser(args.answers_file)
     os.makedirs(os.path.dirname(answers_file), exist_ok=True)
@@ -48,7 +51,8 @@ def eval_model(args):
         qs = line["text"]
         cur_prompt = qs
         if model.config.mm_use_im_start_end:
-            qs = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + DEFAULT_IM_END_TOKEN + '\n' + qs
+            qs = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + \
+                DEFAULT_IM_END_TOKEN + '\n' + qs
         else:
             qs = DEFAULT_IMAGE_TOKEN + '\n' + qs
 
@@ -57,10 +61,13 @@ def eval_model(args):
         conv.append_message(conv.roles[1], None)
         prompt = conv.get_prompt()
 
-        input_ids = tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).cuda()
+        input_ids = tokenizer_image_token(
+            prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).cuda()
 
-        image = Image.open(os.path.join(args.image_folder, image_file)).convert('RGB')
-        image_tensor = process_images([image], image_processor, model.config)[0]
+        image = Image.open(os.path.join(
+            args.image_folder, image_file)).convert('RGB')
+        image_tensor = process_images(
+            [image], image_processor, model.config)[0]
 
         with torch.inference_mode():
             output_ids = model.generate(
@@ -75,7 +82,8 @@ def eval_model(args):
                 max_new_tokens=1024,
                 use_cache=True)
 
-        outputs = tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0].strip()
+        outputs = tokenizer.batch_decode(
+            output_ids, skip_special_tokens=True)[0].strip()
 
         ans_id = shortuuid.uuid()
         ans_file.write(json.dumps({"question_id": idx,
@@ -87,13 +95,17 @@ def eval_model(args):
         ans_file.flush()
     ans_file.close()
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model-path", type=str, default="nahidalam/maya_full_ft")
-    parser.add_argument("--model-base", type=str, default="CohereForAI/aya-23-8B")
+    parser.add_argument("--model-path", type=str,
+                        default="nahidalam/maya_full_ft")
+    parser.add_argument("--model-base", type=str,
+                        default="CohereForAI/aya-23-8B")
     parser.add_argument("--mode", type=str, default="finetuned")
     parser.add_argument("--image-folder", type=str, default="")
-    parser.add_argument("--question-file", type=str, default="tables/question.jsonl")
+    parser.add_argument("--question-file", type=str,
+                        default="tables/question.jsonl")
     parser.add_argument("--answers-file", type=str, default="answer.jsonl")
     parser.add_argument("--conv-mode", type=str, default="llava_v1")
     parser.add_argument("--num-chunks", type=int, default=1)

@@ -14,14 +14,12 @@ from llava.conversation import conv_templates, SeparatorStyle
 from llava.mm_utils import process_images, tokenizer_image_token, get_model_name_from_path
 
 
-
-
-def get_projector_pretrained_cohere_model(model_base : str, model_path : str, projector_path : str) :
+def get_projector_pretrained_cohere_model(model_base: str, model_path: str, projector_path: str):
     """ Function that instantiates a pretrained Cohere/Aya model with only the adapter(projector) layer trained
     This is a replication of the load_pretrained_model function from llava.model.builder thats specific to Cohere/Maya
 
     Args:
-        model_base : Path of the base LLM model in HF. Eg: 'CohereForAI/aya-23-8B', 'meta-llama/Meta-Llama-3-8B-Instruct'. 
+        model_base : Path of the base LLM model in HF. Eg: 'CohereForAI/aya-23-8B', 'meta-llama/Meta-Llama-3-8B-Instruct'.
                      This is used to instantiate the model and the tokenizer
         model_path : Path of the pretrained model in HF. Eg : 'nahidalam/Maya'
                      This is used to load the config file from the pretrained model. So this path/directory should have the config.json file
@@ -39,27 +37,29 @@ def get_projector_pretrained_cohere_model(model_base : str, model_path : str, pr
     kwargs['torch_dtype'] = torch.float16
     kwargs['attn_implementation'] = 'flash_attention_2'
 
-    ## Instantiating tokenizer and model base
+    # Instantiating tokenizer and model base
     tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=True)
     cfg_pretrained = LlavaCohereConfig.from_pretrained(model_path)
-    model = LlavaCohereForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=cfg_pretrained, **kwargs)
+    model = LlavaCohereForCausalLM.from_pretrained(
+        model_base, low_cpu_mem_usage=True, config=cfg_pretrained, **kwargs)
 
-
-    ## Loading Projector layer weights
+    # Loading Projector layer weights
     mm_projector_weights = torch.load(projector_path, map_location='cpu')
-    mm_projector_weights = {k: v.to(torch.float16) for k, v in mm_projector_weights.items()}
+    mm_projector_weights = {k: v.to(torch.float16)
+                            for k, v in mm_projector_weights.items()}
     model.load_state_dict(mm_projector_weights, strict=False)
 
-
-    ## Loading image processor
+    # Loading image processor
     image_processor = None
 
     mm_use_im_start_end = getattr(model.config, "mm_use_im_start_end", False)
-    mm_use_im_patch_token = getattr(model.config, "mm_use_im_patch_token", True)
+    mm_use_im_patch_token = getattr(
+        model.config, "mm_use_im_patch_token", True)
     if mm_use_im_patch_token:
         tokenizer.add_tokens([DEFAULT_IMAGE_PATCH_TOKEN], special_tokens=True)
     if mm_use_im_start_end:
-        tokenizer.add_tokens([DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN], special_tokens=True)
+        tokenizer.add_tokens(
+            [DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN], special_tokens=True)
     model.resize_token_embeddings(len(tokenizer))
 
     vision_tower = model.get_vision_tower()
@@ -77,7 +77,7 @@ def get_projector_pretrained_cohere_model(model_base : str, model_path : str, pr
     return model, tokenizer, image_processor, context_len
 
 
-def get_single_prompt_prediction(model, tokenizer, image_processor, image_file, user_question, temperature = 0.0, max_new_tokens = 100):
+def get_single_prompt_prediction(model, tokenizer, image_processor, image_file, user_question, temperature=0.0, max_new_tokens=100):
     """Generates the prediction for a single image-user question pair.
 
     Args:
@@ -90,15 +90,14 @@ def get_single_prompt_prediction(model, tokenizer, image_processor, image_file, 
         max_new_tokens (int, optional): Max new number of tokens generated. Defaults to 100.
 
     Returns:
-        output (str): Model's response to user question  
+        output (str): Model's response to user question
     """
-  
 
     conv_mode = "llava_v1"  # Need to verify this
     conv = conv_templates[conv_mode].copy()
     roles = conv.roles
 
-    ## Loading input image
+    # Loading input image
     def load_image(image_file):
         if image_file.startswith('http://') or image_file.startswith('https://'):
             response = requests.get(image_file)
@@ -112,7 +111,8 @@ def get_single_prompt_prediction(model, tokenizer, image_processor, image_file, 
 
     image_tensor = process_images([image], image_processor, model.config)
     if type(image_tensor) is list:
-        image_tensor = [image.to(model.device, dtype=torch.float16) for image in image_tensor]
+        image_tensor = [image.to(model.device, dtype=torch.float16)
+                        for image in image_tensor]
     else:
         image_tensor = image_tensor.to(model.device, dtype=torch.float16)
 
@@ -121,7 +121,8 @@ def get_single_prompt_prediction(model, tokenizer, image_processor, image_file, 
     if image is not None:
         # first message
         if model.config.mm_use_im_start_end:
-            inp = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + DEFAULT_IM_END_TOKEN + '\n' + inp
+            inp = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + \
+                DEFAULT_IM_END_TOKEN + '\n' + inp
         else:
             inp = DEFAULT_IMAGE_TOKEN + '\n' + inp
         # image = None
@@ -130,10 +131,12 @@ def get_single_prompt_prediction(model, tokenizer, image_processor, image_file, 
     conv.append_message(conv.roles[1], None)
     prompt = conv.get_prompt()
 
-    input_ids = tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).to(model.device)
+    input_ids = tokenizer_image_token(
+        prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).to(model.device)
     stop_str = conv.sep if conv.sep_style != SeparatorStyle.TWO else conv.sep2
     keywords = [stop_str]
-    streamer = TextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
+    streamer = TextStreamer(tokenizer, skip_prompt=True,
+                            skip_special_tokens=True)
 
     with torch.inference_mode():
         output_ids = model.generate(
@@ -149,6 +152,3 @@ def get_single_prompt_prediction(model, tokenizer, image_processor, image_file, 
     outputs = tokenizer.decode(output_ids[0]).strip()
 
     return outputs
-
-    
-

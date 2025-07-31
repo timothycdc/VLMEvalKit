@@ -20,8 +20,7 @@ from llava.mm_utils import process_images, tokenizer_image_token, get_model_name
 from typing import Optional, Literal
 
 
-def load_maya_model(model_base: str, model_path : str, projector_path : Optional[str] = None, mode = Literal['pretrained','finetuned']):
-
+def load_maya_model(model_base: str, model_path: str, projector_path: Optional[str] = None, mode=Literal['pretrained', 'finetuned']):
     """ Function that helps load a trained Maya model
 
     Trained Maya model can be of two flavors :
@@ -49,34 +48,36 @@ def load_maya_model(model_base: str, model_path : str, projector_path : Optional
     device_map = 'auto'
     kwargs = {"device_map": device_map}
     kwargs['torch_dtype'] = torch.float16
-    #kwargs['attn_implementation'] = 'flash_attention_2'
+    # kwargs['attn_implementation'] = 'flash_attention_2'
 
-    ## Instantiating tokenizer and model base
+    # Instantiating tokenizer and model base
     tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=True)
     cfg_pretrained = LlavaCohereConfig.from_pretrained(model_path)
 
     if mode == 'pretrained':
-        model = LlavaCohereForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=cfg_pretrained, **kwargs)
+        model = LlavaCohereForCausalLM.from_pretrained(
+            model_base, low_cpu_mem_usage=True, config=cfg_pretrained, **kwargs)
 
-        ## Loading Projector layer weights
+        # Loading Projector layer weights
         mm_projector_weights = torch.load(projector_path, map_location='cpu')
-        mm_projector_weights = {k: v.to(torch.float16) for k, v in mm_projector_weights.items()}
+        mm_projector_weights = {k: v.to(torch.float16)
+                                for k, v in mm_projector_weights.items()}
         model.load_state_dict(mm_projector_weights, strict=False)
     else:
-        model = LlavaCohereForCausalLM.from_pretrained(model_path, config=cfg_pretrained, **kwargs)
+        model = LlavaCohereForCausalLM.from_pretrained(
+            model_path, config=cfg_pretrained, **kwargs)
 
-
-
-
-    ## Loading image processor
+    # Loading image processor
     image_processor = None
 
     mm_use_im_start_end = getattr(model.config, "mm_use_im_start_end", False)
-    mm_use_im_patch_token = getattr(model.config, "mm_use_im_patch_token", True)
+    mm_use_im_patch_token = getattr(
+        model.config, "mm_use_im_patch_token", True)
     if mm_use_im_patch_token:
         tokenizer.add_tokens([DEFAULT_IMAGE_PATCH_TOKEN], special_tokens=True)
     if mm_use_im_start_end:
-        tokenizer.add_tokens([DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN], special_tokens=True)
+        tokenizer.add_tokens(
+            [DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN], special_tokens=True)
     model.resize_token_embeddings(len(tokenizer))
 
     vision_tower = model.get_vision_tower()
@@ -91,14 +92,14 @@ def load_maya_model(model_base: str, model_path : str, projector_path : Optional
     else:
         context_len = 2048
 
-    #maya = MayaModel(model, tokenizer, image_processor, context_len)
+    # maya = MayaModel(model, tokenizer, image_processor, context_len)
 
     return model, tokenizer, image_processor, context_len
 
 
 class MayaModel(object):
 
-    def __init__(self, model : LlavaCohereForCausalLM, tokenizer : CohereTokenizerFast, image_processor, context_length):
+    def __init__(self, model: LlavaCohereForCausalLM, tokenizer: CohereTokenizerFast, image_processor, context_length):
         self.model = model
         self.tokenizer = tokenizer
         self.image_processor = image_processor
@@ -109,8 +110,6 @@ class MayaModel(object):
         Method to validate the inputs
         """
         pass
-
-
 
 
 def load_image(image_input):
@@ -131,12 +130,14 @@ def load_image(image_input):
                 # Input is a file path
                 return Image.open(image_input)
             else:
-                raise ValueError("Invalid input: string is neither a valid URL nor a file path")
+                raise ValueError(
+                    "Invalid input: string is neither a valid URL nor a file path")
         elif isinstance(image_input, bytes):
             # Input is bytes
             return Image.open(BytesIO(image_input))
         else:
-            raise ValueError("Invalid input type. Expected URL string, file path string, or bytes.")
+            raise ValueError(
+                "Invalid input type. Expected URL string, file path string, or bytes.")
     except requests.RequestException as e:
         raise ValueError(f"Error fetching image from URL: {e}")
     except IOError as e:
@@ -145,9 +146,7 @@ def load_image(image_input):
         raise ValueError(f"An unexpected error occurred: {e}")
 
 
-
-
-def get_single_sample_prediction(maya_model, image_file, user_question, temperature = 0.0, max_new_tokens = 100, conv_mode = 'aya'):
+def get_single_sample_prediction(maya_model, image_file, user_question, temperature=0.0, max_new_tokens=100, conv_mode='aya'):
     """Generates the prediction for a single image-user question pair.
 
     Args:
@@ -162,7 +161,6 @@ def get_single_sample_prediction(maya_model, image_file, user_question, temperat
         output (str): Model's response to user question
     """
 
-
     conv = conv_templates[conv_mode].copy()
     roles = conv.roles
     model = maya_model.model
@@ -174,7 +172,8 @@ def get_single_sample_prediction(maya_model, image_file, user_question, temperat
 
     image_tensor = process_images([image], image_processor, model.config)
     if type(image_tensor) is list:
-        image_tensor = [image.to(model.device, dtype=torch.float16) for image in image_tensor]
+        image_tensor = [image.to(model.device, dtype=torch.float16)
+                        for image in image_tensor]
     else:
         image_tensor = image_tensor.to(model.device, dtype=torch.float16)
 
@@ -183,7 +182,8 @@ def get_single_sample_prediction(maya_model, image_file, user_question, temperat
     if image is not None:
         # first message
         if model.config.mm_use_im_start_end:
-            inp = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + DEFAULT_IM_END_TOKEN + '\n' + inp
+            inp = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + \
+                DEFAULT_IM_END_TOKEN + '\n' + inp
         else:
             inp = DEFAULT_IMAGE_TOKEN + '\n' + inp
         # image = None
@@ -192,10 +192,12 @@ def get_single_sample_prediction(maya_model, image_file, user_question, temperat
     conv.append_message(conv.roles[1], None)
     prompt = conv.get_prompt()
 
-    input_ids = tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).to(model.device)
+    input_ids = tokenizer_image_token(
+        prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).to(model.device)
     stop_str = conv.sep if conv.sep_style != SeparatorStyle.TWO else conv.sep2
     keywords = [stop_str]
-    streamer = TextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
+    streamer = TextStreamer(tokenizer, skip_prompt=True,
+                            skip_special_tokens=True)
 
     with torch.inference_mode():
         output_ids = model.generate(

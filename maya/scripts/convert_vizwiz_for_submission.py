@@ -26,7 +26,7 @@ if __name__ == '__main__':
             results.append(json.loads(line))
         except:
             error_line += 1
-    
+
     # Map question_id (concatenation of image + question) to result text
     results = {x['question_id']: x['text'] for x in results}
 
@@ -35,23 +35,24 @@ if __name__ == '__main__':
         test_split = json.load(f)
 
     # Generate question_id by concatenating image + _ + question
-    split_ids = set([x['image'] +"_"+ x['question'] for x in test_split])
+    split_ids = set([x['image'] + "_" + x['question'] for x in test_split])
 
-    print(f'total results: {len(results)}, total split: {len(test_split)}, error_line: {error_line}')
+    print(
+        f'total results: {len(results)}, total split: {len(test_split)}, error_line: {error_line}')
 
     all_answers = []
 
     answer_processor = EvalAIAnswerProcessor()
 
     for x in test_split:
-        question_id = x['question'] + "_"+ x['image']
+        question_id = x['question'] + "_" + x['image']
         try:
             assert question_id in results
         except:
             break
         all_answers.append({
             'image': x['image'],
-            'question' : x['question'],
+            'question': x['question'],
             'answer': answer_processor(results[question_id])
         })
 

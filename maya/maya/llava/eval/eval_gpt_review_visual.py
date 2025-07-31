@@ -51,13 +51,15 @@ def parse_score(review):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='ChatGPT-based QA evaluation.')
+    parser = argparse.ArgumentParser(
+        description='ChatGPT-based QA evaluation.')
     parser.add_argument('-q', '--question')
     parser.add_argument('-c', '--context')
     parser.add_argument('-a', '--answer-list', nargs='+', default=[])
     parser.add_argument('-r', '--rule')
     parser.add_argument('-o', '--output')
-    parser.add_argument('--max-tokens', type=int, default=1024, help='maximum number of tokens produced in the output')
+    parser.add_argument('--max-tokens', type=int, default=1024,
+                        help='maximum number of tokens produced in the output')
     args = parser.parse_args()
 
     f_q = open(os.path.expanduser(args.question))
@@ -66,13 +68,15 @@ if __name__ == '__main__':
     rule_dict = json.load(open(os.path.expanduser(args.rule), 'r'))
 
     if os.path.isfile(os.path.expanduser(args.output)):
-        cur_reviews = [json.loads(line) for line in open(os.path.expanduser(args.output))]
+        cur_reviews = [json.loads(line) for line in open(
+            os.path.expanduser(args.output))]
     else:
         cur_reviews = []
 
     review_file = open(f'{args.output}', 'a')
 
-    context_list = [json.loads(line) for line in open(os.path.expanduser(args.context))]
+    context_list = [json.loads(line)
+                    for line in open(os.path.expanduser(args.context))]
     image_to_context = {context['image']: context for context in context_list}
 
     handles = []
@@ -84,7 +88,8 @@ if __name__ == '__main__':
 
         inst = image_to_context[ques['image']]
         cap_str = '\n'.join(inst['captions'])
-        box_str = '\n'.join([f'{instance["category"]}: {instance["bbox"]}' for instance in inst['instances']])
+        box_str = '\n'.join(
+            [f'{instance["category"]}: {instance["bbox"]}' for instance in inst['instances']])
 
         category = json.loads(ques_js)['category']
         if category in rule_dict:

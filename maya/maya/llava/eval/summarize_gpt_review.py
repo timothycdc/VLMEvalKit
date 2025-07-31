@@ -6,8 +6,10 @@ import numpy as np
 
 import argparse
 
+
 def parse_args():
-    parser = argparse.ArgumentParser(description='ChatGPT-based QA evaluation.')
+    parser = argparse.ArgumentParser(
+        description='ChatGPT-based QA evaluation.')
     parser.add_argument('-d', '--dir', default=None)
     parser.add_argument('-v', '--version', default=None)
     parser.add_argument('-s', '--select', nargs='*', default=None)
@@ -25,10 +27,12 @@ if __name__ == '__main__':
     if len(args.files) > 0:
         review_files = args.files
     else:
-        review_files = [x for x in os.listdir(args.dir) if x.endswith('.jsonl') and (x.startswith('gpt4_text') or x.startswith('reviews_') or x.startswith('review_') or 'review' in args.dir)]
+        review_files = [x for x in os.listdir(args.dir) if x.endswith('.jsonl') and (x.startswith(
+            'gpt4_text') or x.startswith('reviews_') or x.startswith('review_') or 'review' in args.dir)]
 
     for review_file in sorted(review_files):
-        config = os.path.basename(review_file).replace('gpt4_text_', '').replace('.jsonl', '')
+        config = os.path.basename(review_file).replace(
+            'gpt4_text_', '').replace('.jsonl', '')
         if args.select is not None and any(x not in config for x in args.select):
             continue
         if '0613' in config:
@@ -56,5 +60,6 @@ if __name__ == '__main__':
             stats = np.asarray(v).mean(0).tolist()
             stats = [round(x, 3) for x in stats]
             # print(k, stats, round(stats[1]/stats[0]*100, 1))
-            print(k, round(stats[1]/stats[0]*100, 1), round(stats[0] * 10, 1), round(stats[1] * 10, 1))
+            print(k, round(stats[1]/stats[0]*100, 1),
+                  round(stats[0] * 10, 1), round(stats[1] * 10, 1))
         print('=================================')

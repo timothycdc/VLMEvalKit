@@ -18,7 +18,7 @@ def get_choice_text(probelm, options):
     for i, c in enumerate(choices):
         choice_list.append("({}) {}".format(options[i], c))
     choice_txt = " ".join(choice_list)
-    #print(choice_txt)
+    # print(choice_txt)
     return choice_txt
 
 
@@ -42,7 +42,7 @@ def create_one_example_chatbot(format, question, context, choice, answer, lectur
 
     input_format, output_format = format.split("-")
 
-    ## Inputs
+    # Inputs
     if input_format == "CQM":
         input = f"Context: {context}\nQuestion: {question}\nOptions: {choice}\n"
     elif input_format == "QCM":
@@ -107,7 +107,7 @@ def create_one_example(format, question, context, choice, answer, lecture, solut
 
     input_format, output_format = format.split("-")
 
-    ## Inputs
+    # Inputs
     if input_format == "CQM":
         input = f"Context: {context}\nQuestion: {question}\nOptions: {choice}\n"
     elif input_format == "QCM":
@@ -158,12 +158,11 @@ def create_one_example(format, question, context, choice, answer, lecture, solut
     return text
 
 
-
 def create_one_example_gpt4(format, question, context, choice, answer, lecture, solution, test_example=True):
 
     input_format, output_format = format.split("-")
 
-    ## Inputs
+    # Inputs
     if input_format == "CQM":
         input = f"Context: {context}\nQuestion: {question}\nOptions: {choice}\n"
     elif input_format == "QCM":
@@ -230,13 +229,13 @@ def build_prompt_chatbot(problems, shot_qids, prompt_format, use_caption=False, 
         solution = get_solution_text(problems[qid]).replace('\\n', '\n')
 
         train_example = create_one_example_chatbot(prompt_format,
-                                           question,
-                                           context,
-                                           choice,
-                                           answer,
-                                           lecture,
-                                           solution,
-                                           test_example=is_test)
+                                                   question,
+                                                   context,
+                                                   choice,
+                                                   answer,
+                                                   lecture,
+                                                   solution,
+                                                   test_example=is_test)
         examples[qid] = train_example
     return examples
 
@@ -290,7 +289,8 @@ def build_prompt(problems, shot_qids, test_qid, args):
 
 def build_prompt_gpt4(problems, shot_qids, test_qid, args):
 
-    prompt_array = [{"role": "system", "content": "You are a helpful assistant."}]
+    prompt_array = [
+        {"role": "system", "content": "You are a helpful assistant."}]
 
     # n-shot training examples
     for qid in shot_qids:
@@ -302,13 +302,13 @@ def build_prompt_gpt4(problems, shot_qids, test_qid, args):
         solution = get_solution_text(problems[qid])
 
         user_prompt, assistant_prompt = create_one_example_gpt4(args.prompt_format,
-                                           question,
-                                           context,
-                                           choice,
-                                           answer,
-                                           lecture,
-                                           solution,
-                                           test_example=False)
+                                                                question,
+                                                                context,
+                                                                choice,
+                                                                answer,
+                                                                lecture,
+                                                                solution,
+                                                                test_example=False)
         prompt_array.append(user_prompt)
         prompt_array.append(assistant_prompt)
 
@@ -321,13 +321,13 @@ def build_prompt_gpt4(problems, shot_qids, test_qid, args):
     solution = get_solution_text(problems[test_qid])
 
     user_prompt, assistant_prompt = create_one_example_gpt4(args.prompt_format,
-                                      question,
-                                      context,
-                                      choice,
-                                      answer,
-                                      lecture,
-                                      solution,
-                                      test_example=True)
+                                                            question,
+                                                            context,
+                                                            choice,
+                                                            answer,
+                                                            lecture,
+                                                            solution,
+                                                            test_example=True)
     prompt_array.append(user_prompt)
     prompt_array.append(assistant_prompt)
 

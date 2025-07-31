@@ -17,8 +17,7 @@ def eval_model(model_name, questions_file, answers_file):
     model_name = os.path.expanduser(model_name)
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False)
     model = AutoModelForCausalLM.from_pretrained(model_name,
-        torch_dtype=torch.float16).cuda()
-
+                                                 torch_dtype=torch.float16).cuda()
 
     ques_file = open(os.path.expanduser(questions_file), "r")
     ans_file = open(os.path.expanduser(answers_file), "w")
@@ -37,7 +36,8 @@ def eval_model(model_name, questions_file, answers_file):
             use_cache=True,
             temperature=0.7,
             max_new_tokens=1024,)
-        outputs = tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0]
+        outputs = tokenizer.batch_decode(
+            output_ids, skip_special_tokens=True)[0]
         try:
             index = outputs.index(conv.sep, len(prompt))
         except ValueError:
@@ -54,10 +54,12 @@ def eval_model(model_name, questions_file, answers_file):
         ans_file.flush()
     ans_file.close()
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model-name", type=str, default="facebook/opt-350m")
-    parser.add_argument("--question-file", type=str, default="tables/question.jsonl")
+    parser.add_argument("--question-file", type=str,
+                        default="tables/question.jsonl")
     parser.add_argument("--answers-file", type=str, default="answer.jsonl")
     args = parser.parse_args()
 

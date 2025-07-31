@@ -3444,7 +3444,11 @@ class OCRBench_v2(ImageBaseDataset):
 
 class AyaVisionBench(ImageVQADataset):
     TYPE = 'VQA'
-    DATASET_URL = {"AyaVisionBench": "https://huggingface.co/datasets/timothycdc/VLMEvalKit_AyaVisionBench/resolve/main/aya_vision_bench.tsv" }
+    DATASET_URL = {
+        "AyaVisionBench":
+            "https://huggingface.co/datasets/timothycdc/"
+            "VLMEvalKit_AyaVisionBench/resolve/main/aya_vision_bench.tsv"
+    }
 
     def build_prompt(self, line):
         msgs = super().build_prompt(line)
@@ -3456,7 +3460,8 @@ class AyaVisionBench(ImageVQADataset):
     def evaluate(self, eval_file, **judge_kwargs):
         model_name = judge_kwargs.get('model', None)
         if not model_name:
-            raise ValueError("A model must be specified for AyaVisionBench evaluation. Please use --judge <model_name>.")
+            raise ValueError("A model must be specified for "
+                             "AyaVisionBench evaluation. Please use --judge <model_name>.")
 
         from .utils.ayavision import AyaVision_auxeval
         model = build_judge(**judge_kwargs)
@@ -3477,7 +3482,7 @@ class AyaVisionBench(ImageVQADataset):
         ans = {}
         if osp.exists(tmp_file):
             ans = load(tmp_file)
-        
+
         tups = [x for x, i in zip(tups, indices) if i not in ans]
         indices = [i for i in indices if i not in ans]
 
@@ -3498,15 +3503,15 @@ class AyaVisionBench(ImageVQADataset):
         data['hit'] = [ans[idx]['hit'] for idx in data['index']]
         data['res'] = [ans[idx]['res'] for idx in data['index']]
         data['log'] = [ans[idx]['log'] for idx in data['index']]
-        
+
         # Rename 'hit' to 'acc' for compatibility with report_acc
         data['acc'] = data['hit']
-        
+
         dump(data, storage)
-        
+
         from .utils.multiple_choice import report_acc
         ret = report_acc(data)
-        
+
         ret.round(2)
 
         result_file = eval_file.replace(f'.{suffix}', '_acc.csv')

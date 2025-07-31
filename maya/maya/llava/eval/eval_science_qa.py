@@ -12,7 +12,8 @@ def get_args():
     parser.add_argument('--output-file', type=str)
     parser.add_argument('--output-result', type=str)
     parser.add_argument('--split', type=str, default='test')
-    parser.add_argument('--options', type=list, default=["A", "B", "C", "D", "E"])
+    parser.add_argument('--options', type=list,
+                        default=["A", "B", "C", "D", "E"])
     return parser.parse_args()
 
 
@@ -40,7 +41,8 @@ if __name__ == "__main__":
     args = get_args()
 
     base_dir = args.base_dir
-    split_indices = json.load(open(os.path.join(base_dir, "pid_splits.json")))[args.split]
+    split_indices = json.load(
+        open(os.path.join(base_dir, "pid_splits.json")))[args.split]
     problems = json.load(open(os.path.join(base_dir, "problems.json")))
     predictions = [json.loads(line) for line in open(args.result_file)]
     predictions = {pred['question_id']: pred for pred in predictions}
@@ -85,7 +87,8 @@ if __name__ == "__main__":
             'is_multimodal': '<image>' in pred['prompt'],
         }
 
-        sqa_results['results'][prob_id] = get_pred_idx(answer, prob['choices'], args.options)
+        sqa_results['results'][prob_id] = get_pred_idx(
+            answer, prob['choices'], args.options)
         sqa_results['outputs'][prob_id] = pred_text
 
         if pred_idx == prob['answer']:
@@ -97,8 +100,10 @@ if __name__ == "__main__":
     total = len(results['correct']) + len(results['incorrect'])
 
     ###### IMG ######
-    multimodal_correct = len([x for x in results['correct'] if x['is_multimodal']])
-    multimodal_incorrect = len([x for x in results['incorrect'] if x['is_multimodal']])
+    multimodal_correct = len(
+        [x for x in results['correct'] if x['is_multimodal']])
+    multimodal_incorrect = len(
+        [x for x in results['incorrect'] if x['is_multimodal']])
     multimodal_total = multimodal_correct + multimodal_incorrect
     ###### IMG ######
 

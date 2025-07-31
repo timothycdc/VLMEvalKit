@@ -7,7 +7,8 @@ def auto_upgrade(config):
         assert cfg.model_type == 'llama'
         print("You are using newer LLaVA code base, while the checkpoint of v0 is from older code base.")
         print("You must upgrade the checkpoint to the new code base (this can be done automatically).")
-        confirm = input("Please confirm that you want to upgrade the checkpoint. [Y/N]")
+        confirm = input(
+            "Please confirm that you want to upgrade the checkpoint. [Y/N]")
         if confirm.lower() in ["y", "yes"]:
             print("Upgrading checkpoint...")
             assert len(cfg.architectures) == 1

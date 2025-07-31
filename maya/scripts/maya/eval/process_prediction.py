@@ -13,4 +13,3 @@ accuracy = (predictions == answers).mean()
 
 # Print the accuracy
 print(f"Accuracy: {accuracy * 100:.2f}%")
-

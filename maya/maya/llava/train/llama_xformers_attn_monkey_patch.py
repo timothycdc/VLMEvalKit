@@ -13,7 +13,8 @@ from torch import nn
 try:
     import xformers.ops
 except ImportError:
-    logging.error("xformers not found! Please install it before trying to use it.")
+    logging.error(
+        "xformers not found! Please install it before trying to use it.")
 
 
 def replace_llama_attn_with_xformers_attn():

@@ -7,7 +7,7 @@ import re
 models = ['vicuna']
 
 
-def read_jsonl(path: str, key: str=None):
+def read_jsonl(path: str, key: str = None):
     data = []
     with open(os.path.expanduser(path)) as f:
         for line in f:
@@ -34,10 +34,13 @@ if __name__ == '__main__':
     # bard_answers = read_jsonl('table/answer/answer_bard.jsonl', key='question_id')
     # gpt35_answers = read_jsonl('table/answer/answer_gpt35.jsonl', key='question_id')
     # llama_answers = read_jsonl('table/answer/answer_llama-13b.jsonl', key='question_id')
-    vicuna_answers = read_jsonl('table/answer/answer_vicuna-13b.jsonl', key='question_id')
-    ours_answers = read_jsonl('table/results/llama-13b-hf-alpaca.jsonl', key='question_id')
+    vicuna_answers = read_jsonl(
+        'table/answer/answer_vicuna-13b.jsonl', key='question_id')
+    ours_answers = read_jsonl(
+        'table/results/llama-13b-hf-alpaca.jsonl', key='question_id')
 
-    review_vicuna = read_jsonl('table/review/review_vicuna-13b_llama-13b-hf-alpaca.jsonl', key='question_id')
+    review_vicuna = read_jsonl(
+        'table/review/review_vicuna-13b_llama-13b-hf-alpaca.jsonl', key='question_id')
     # review_alpaca = read_jsonl('table/review/review_alpaca-13b_vicuna-13b.jsonl', key='question_id')
     # review_bard = read_jsonl('table/review/review_bard_vicuna-13b.jsonl', key='question_id')
     # review_gpt35 = read_jsonl('table/review/review_gpt35_vicuna-13b.jsonl', key='question_id')
@@ -82,7 +85,8 @@ if __name__ == '__main__':
             if re.match(r'\d+[, ]+\d+', lines[0]):
                 lines = lines[1:]
             v = '\n'.join(lines)
-            cleaned_evals[k] = v.replace('Assistant 1', "**Assistant 1**").replace('Assistant 2', '**Assistant 2**')
+            cleaned_evals[k] = v.replace(
+                'Assistant 1', "**Assistant 1**").replace('Assistant 2', '**Assistant 2**')
 
         r['evaluations'] = cleaned_evals
         records.append(r)
@@ -102,7 +106,7 @@ if __name__ == '__main__':
         if r['id'] == 7:
             r['id'] = 1
         elif r['id'] < 7:
-            r['id'] += 1 
+            r['id'] += 1
 
     records.sort(key=lambda x: x['id'])
 

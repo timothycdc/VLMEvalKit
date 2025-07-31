@@ -127,7 +127,7 @@ acc: 0.575
 acc_plus: 0.2
 
 
-Total Score: 1265.3873549419768 
+Total Score: 1265.3873549419768
 
 existence score: 180.0
 count score: 118.33333333333334
@@ -192,7 +192,7 @@ acc: 0.6
 acc_plus: 0.25
 
 
-Total Score: 336.42857142857144 
+Total Score: 336.42857142857144
 
 commonsense_reasoning score: 131.42857142857142
 numerical_calculation score: 57.5

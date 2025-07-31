@@ -22,7 +22,7 @@
 
 ## Install
 
-The following steps worked on a `CUDA Version: 12.4`. 
+The following steps worked on a `CUDA Version: 12.4`.
 
 1. Clone this repository and navigate to maya directory
 ```bash
@@ -53,10 +53,10 @@ pip install flash-attn==2.6.3 --no-build-isolation --no-cache-dir
 
 ### Pretraining
 
-To pretrain the projection layer, 
+To pretrain the projection layer,
 - get the pretraining dataset from [HuggingFace](https://huggingface.co/maya-multimodal) and keep it in `/dev/data/LLaVA_Pretrain`
 - get the images with `wget https://huggingface.co/datasets/liuhaotian/LLaVA-Pretrain/resolve/main/images.zip` and keep them in `/dev/data/images`
-  
+
 ```
 bash scripts/maya/pretrain_aya_siglip.sh
 ```
@@ -122,13 +122,13 @@ bash scripts/v1_5/eval/eval_all_languages.sh \
 If you find Maya useful for your research and applications, please cite using this BibTeX:
 ```
 @misc{alam2024mayainstructionfinetunedmultilingual,
-      title={Maya: An Instruction Finetuned Multilingual Multimodal Model}, 
+      title={Maya: An Instruction Finetuned Multilingual Multimodal Model},
       author={Nahid Alam and Karthik Reddy Kanjula and Surya Guthikonda and Timothy Chung and Bala Krishna S Vegesna and Abhipsha Das and Anthony Susevski and Ryan Sze-Yin Chan and S M Iftekhar Uddin and Shayekh Bin Islam and Roshan Santhosh and Snegha A and Drishti Sharma and Chen Liu and Isha Chaturvedi and Genta Indra Winata and Ashvanth. S and Snehanshu Mukherjee and Alham Fikri Aji},
       year={2024},
       eprint={2412.07112},
       archivePrefix={arXiv},
       primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2412.07112}, 
+      url={https://arxiv.org/abs/2412.07112},
 }
 ```
 

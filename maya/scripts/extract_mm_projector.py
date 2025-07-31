@@ -26,7 +26,8 @@ if __name__ == '__main__':
     keys_to_match = ['mm_projector']
     ckpt_to_key = defaultdict(list)
     try:
-        model_indices = json.load(open(os.path.join(args.model_path, 'pytorch_model.bin.index.json')))
+        model_indices = json.load(
+            open(os.path.join(args.model_path, 'pytorch_model.bin.index.json')))
         for k, v in model_indices['weight_map'].items():
             if any(key_match in k for key_match in keys_to_match):
                 ckpt_to_key[v].append(k)
@@ -40,7 +41,8 @@ if __name__ == '__main__':
     loaded_weights = {}
 
     for ckpt_name, weight_keys in ckpt_to_key.items():
-        ckpt = torch.load(os.path.join(args.model_path, ckpt_name), map_location='cpu')
+        ckpt = torch.load(os.path.join(
+            args.model_path, ckpt_name), map_location='cpu')
         for k in weight_keys:
             loaded_weights[k] = ckpt[k]
 

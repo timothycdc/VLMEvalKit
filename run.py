@@ -390,7 +390,6 @@ def main():
                         judge_kwargs['model'] = 'gpt-4o'
                     elif listinstr(['AyaVisionBench', 'CVQA_EN', 'CVQA_LOC'], dataset_name):
                         judge_kwargs['model'] = 'gpt-4.1'
-                    
 
                 if args.use_verifier:
                     judge_kwargs['use_verifier'] = True

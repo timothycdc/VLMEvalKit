@@ -57,7 +57,8 @@ def eval_model(args):
     )
 
     qs = args.query
-    image_token_se = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + DEFAULT_IM_END_TOKEN
+    image_token_se = DEFAULT_IM_START_TOKEN + \
+        DEFAULT_IMAGE_TOKEN + DEFAULT_IM_END_TOKEN
     if IMAGE_PLACEHOLDER in qs:
         if model.config.mm_use_im_start_end:
             qs = re.sub(IMAGE_PLACEHOLDER, image_token_se, qs)
@@ -106,7 +107,8 @@ def eval_model(args):
     ).to(model.device, dtype=torch.float16)
 
     input_ids = (
-        tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt")
+        tokenizer_image_token(
+            prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt")
         .unsqueeze(0)
         .cuda()
     )
@@ -124,7 +126,8 @@ def eval_model(args):
             use_cache=True,
         )
 
-    outputs = tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0].strip()
+    outputs = tokenizer.batch_decode(
+        output_ids, skip_special_tokens=True)[0].strip()
     print(outputs)
 
 

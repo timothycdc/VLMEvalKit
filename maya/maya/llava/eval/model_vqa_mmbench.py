@@ -41,6 +41,7 @@ def is_none(value):
         return True
     return False
 
+
 def get_options(row, options):
     parsed_options = []
     for option in options:
@@ -57,9 +58,11 @@ def eval_model(args):
     model_path = os.path.expanduser(args.model_path)
     model_name = get_model_name_from_path(model_path)
     if 'maya' not in model_name:
-        tokenizer, model, image_processor, context_len = load_pretrained_model(model_path, args.model_base, model_name)
+        tokenizer, model, image_processor, context_len = load_pretrained_model(
+            model_path, args.model_base, model_name)
     else:
-        model, tokenizer, image_processor, context_len = load_maya_model(args.model_base, model_path, mode = args.mode)
+        model, tokenizer, image_processor, context_len = load_maya_model(
+            args.model_base, model_path, mode=args.mode)
     questions = pd.read_table(os.path.expanduser(args.question_file))
     questions = get_chunk(questions, args.num_chunks, args.chunk_idx)
     answers_file = os.path.expanduser(args.answers_file)
@@ -68,7 +71,8 @@ def eval_model(args):
 
     if 'plain' in model_name and 'finetune' not in model_name.lower() and 'mmtag' not in args.conv_mode:
         args.conv_mode = args.conv_mode + '_mmtag'
-        print(f'It seems that this is a plain model, but it is not using a mmtag prompt, auto switching to {args.conv_mode}.')
+        print(
+            f'It seems that this is a plain model, but it is not using a mmtag prompt, auto switching to {args.conv_mode}.')
 
     for index, row in tqdm(questions.iterrows(), total=len(questions)):
         options = get_options(row, all_options)
@@ -90,7 +94,8 @@ def eval_model(args):
                 question = question + '\n' + option_char + '. ' + option
             qs = cur_prompt = question
             if model.config.mm_use_im_start_end:
-                qs = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + DEFAULT_IM_END_TOKEN + '\n' + qs
+                qs = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + \
+                    DEFAULT_IM_END_TOKEN + '\n' + qs
             else:
                 qs = DEFAULT_IMAGE_TOKEN + '\n' + qs
 
@@ -105,9 +110,11 @@ def eval_model(args):
             conv.append_message(conv.roles[1], None)
             prompt = conv.get_prompt()
 
-            input_ids = tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).cuda()
+            input_ids = tokenizer_image_token(
+                prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).cuda()
 
-            image_tensor = process_images([image], image_processor, model.config)[0]
+            image_tensor = process_images(
+                [image], image_processor, model.config)[0]
 
             with torch.inference_mode():
                 output_ids = model.generate(
@@ -122,18 +129,19 @@ def eval_model(args):
                     max_new_tokens=1024,
                     use_cache=True)
 
-            outputs = tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0].strip()
+            outputs = tokenizer.batch_decode(
+                output_ids, skip_special_tokens=True)[0].strip()
 
             ans_id = shortuuid.uuid()
             ans_file.write(json.dumps({"question_id": idx,
-                                    "round_id": round_idx,
-                                    "prompt": cur_prompt,
-                                    "text": outputs,
-                                    "options": options,
-                                    "option_char": cur_option_char,
-                                    "answer_id": ans_id,
-                                    "model_id": model_name,
-                                    "metadata": {}}) + "\n")
+                                       "round_id": round_idx,
+                                       "prompt": cur_prompt,
+                                       "text": outputs,
+                                       "options": options,
+                                       "option_char": cur_option_char,
+                                       "answer_id": ans_id,
+                                       "model_id": model_name,
+                                       "metadata": {}}) + "\n")
             ans_file.flush()
 
             # rotate options
@@ -141,13 +149,17 @@ def eval_model(args):
             cur_option_char = cur_option_char[1:] + cur_option_char[:1]
     ans_file.close()
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model-path", type=str, default="nahidalam/maya_full_ft")
-    parser.add_argument("--model-base", type=str, default="CohereForAI/aya-23-8B")
+    parser.add_argument("--model-path", type=str,
+                        default="nahidalam/maya_full_ft")
+    parser.add_argument("--model-base", type=str,
+                        default="CohereForAI/aya-23-8B")
     parser.add_argument("--mode", type=str, default="finetuned")
     parser.add_argument("--image-folder", type=str, default="")
-    parser.add_argument("--question-file", type=str, default="tables/question.jsonl")
+    parser.add_argument("--question-file", type=str,
+                        default="tables/question.jsonl")
     parser.add_argument("--answers-file", type=str, default="answer.jsonl")
     parser.add_argument("--conv-mode", type=str, default="llava_v1")
     parser.add_argument("--num-chunks", type=int, default=1)

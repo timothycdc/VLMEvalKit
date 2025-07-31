@@ -6,7 +6,8 @@ from convert_sqa_to_llava_base_prompt import build_prompt_chatbot
 
 
 def convert_to_llava(base_dir, split, prompt_format="QCM-LEA"):
-    split_indices = json.load(open(os.path.join(base_dir, "pid_splits.json")))[split]
+    split_indices = json.load(
+        open(os.path.join(base_dir, "pid_splits.json")))[split]
     problems = json.load(open(os.path.join(base_dir, "problems.json")))
 
     split_problems = build_prompt_chatbot(
@@ -47,14 +48,16 @@ def convert_to_llava(base_dir, split, prompt_format="QCM-LEA"):
 
 
 def convert_to_jsonl(base_dir, split, prompt_format="QCM-LEPA"):
-    split_indices = json.load(open(os.path.join(base_dir, "pid_splits.json")))[split]
+    split_indices = json.load(
+        open(os.path.join(base_dir, "pid_splits.json")))[split]
     problems = json.load(open(os.path.join(base_dir, "problems.json")))
 
     split_problems = build_prompt_chatbot(
         problems, split_indices, prompt_format,
         use_caption=False, is_test=False)
 
-    writer = open(os.path.join(base_dir, f"scienceqa_{split}_{prompt_format}.jsonl"), "w")
+    writer = open(os.path.join(
+        base_dir, f"scienceqa_{split}_{prompt_format}.jsonl"), "w")
     for prob_id, (input, output) in split_problems.items():
         if input.startswith('Question: '):
             input = input.replace('Question: ', '')

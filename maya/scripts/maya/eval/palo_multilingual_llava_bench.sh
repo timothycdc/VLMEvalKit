@@ -9,7 +9,7 @@
 # Note:
 #   - MODE: Choose either 'pretrained' or 'finetuned' (without quotes). Example: finetuned
 #   - PROJECTOR_PATH: required if MODE=pretrained
-#   - See Readme for more details 
+#   - See Readme for more details
 
 
 
@@ -34,7 +34,7 @@ evaluate_language() {
     local OUTPUT_FILE="Maya_${LANG}.jsonl"
 
     echo "******** Evaluating Maya on $LANG ********"
-    
+
     cmd="python llava/eval/model_vqa_maya.py \
         --model-base "$MODEL_BASE" \
         --model-path "$MODEL_PATH" \
@@ -63,7 +63,7 @@ evaluate_language() {
             "$ANSWERS" \
             "$OUTPUT_DIR/$OUTPUT_FILE" \
         --output \
-            "$OUTPUT_DIR/reviews/$OUTPUT_FILE"      
+            "$OUTPUT_DIR/reviews/$OUTPUT_FILE"
 
     python llava/eval/summarize_gpt_review.py -f "$OUTPUT_DIR/reviews/$OUTPUT_FILE"
 

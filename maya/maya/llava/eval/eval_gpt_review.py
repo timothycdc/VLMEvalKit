@@ -9,6 +9,7 @@ import time
 
 NUM_SECONDS_TO_SLEEP = 3
 
+
 @ray.remote(num_cpus=4)
 def get_eval(content: str, max_tokens: int):
     while True:
@@ -54,13 +55,15 @@ def parse_score(review):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='ChatGPT-based QA evaluation.')
+    parser = argparse.ArgumentParser(
+        description='ChatGPT-based QA evaluation.')
     parser.add_argument('-q', '--question')
     # parser.add_argument('-a', '--answer')
     parser.add_argument('-a', '--answer-list', nargs='+', default=[])
     parser.add_argument('-r', '--rule')
     parser.add_argument('-o', '--output')
-    parser.add_argument('--max-tokens', type=int, default=1024, help='maximum number of tokens produced in the output')
+    parser.add_argument('--max-tokens', type=int, default=1024,
+                        help='maximum number of tokens produced in the output')
     args = parser.parse_args()
 
     ray.init()

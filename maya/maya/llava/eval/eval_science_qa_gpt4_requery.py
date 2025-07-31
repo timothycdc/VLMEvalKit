@@ -14,7 +14,8 @@ def get_args():
     parser.add_argument('--our-result', type=str)
     parser.add_argument('--output-result', type=str)
     parser.add_argument('--split', type=str, default='test')
-    parser.add_argument('--options', type=list, default=["A", "B", "C", "D", "E"])
+    parser.add_argument('--options', type=list,
+                        default=["A", "B", "C", "D", "E"])
     return parser.parse_args()
 
 
@@ -41,14 +42,16 @@ if __name__ == "__main__":
     args = get_args()
 
     base_dir = args.base_dir
-    split_indices = json.load(open(os.path.join(base_dir, "pid_splits.json")))[args.split]
+    split_indices = json.load(
+        open(os.path.join(base_dir, "pid_splits.json")))[args.split]
     problems = json.load(open(os.path.join(base_dir, "problems.json")))
     our_predictions = [json.loads(line) for line in open(args.our_result)]
     our_predictions = {pred['question_id']: pred for pred in our_predictions}
     split_problems = {idx: problems[idx] for idx in split_indices}
 
-    requery_predictions = [json.loads(line) for line in open(args.requery_result)]
-    requery_predictions = {pred['question_id']: pred for pred in requery_predictions}
+    requery_predictions = [json.loads(line)
+                           for line in open(args.requery_result)]
+    requery_predictions = {pred['question_id']                           : pred for pred in requery_predictions}
 
     gpt4_predictions = json.load(open(args.gpt4_result))['outputs']
 
@@ -94,8 +97,10 @@ if __name__ == "__main__":
             gpt4_answer = "FAILED"
 
         our_pred_idx = get_pred_idx(our_answer, prob['choices'], args.options)
-        gpt4_pred_idx = get_pred_idx(gpt4_answer, prob['choices'], args.options)
-        requery_pred_idx = get_pred_idx(requery_answer, prob['choices'], args.options)
+        gpt4_pred_idx = get_pred_idx(
+            gpt4_answer, prob['choices'], args.options)
+        requery_pred_idx = get_pred_idx(
+            requery_answer, prob['choices'], args.options)
 
         results['total'] += 1
 
@@ -133,12 +138,18 @@ print("=====================================")
             results['correct_upperbound'] += 1
 
     total = results['total']
-    print(f'Total: {total}, Our-Correct: {results["our_correct"]}, Accuracy: {results["our_correct"] / total * 100:.2f}%')
-    print(f'Total: {total}, GPT-4-Correct: {results["gpt4_correct"]}, Accuracy: {results["gpt4_correct"] / total * 100:.2f}%')
-    print(f'Total: {total}, GPT-4 NO-ANS (RANDOM): {results["gpt4_failed"]}, Percentage: {results["gpt4_failed"] / total * 100:.2f}%')
-    print(f'Total: {total}, GPT-4-OursVisual-Correct: {results["gpt4_ourvisual_correct"]}, Accuracy: {results["gpt4_ourvisual_correct"] / total * 100:.2f}%')
-    print(f'Total: {total}, Requery-Correct: {results["requery_correct"]}, Accuracy: {results["requery_correct"] / total * 100:.2f}%')
-    print(f'Total: {total}, Correct upper: {results["correct_upperbound"]}, Accuracy: {results["correct_upperbound"] / total * 100:.2f}%')
+    print(
+        f'Total: {total}, Our-Correct: {results["our_correct"]}, Accuracy: {results["our_correct"] / total * 100:.2f}%')
+    print(
+        f'Total: {total}, GPT-4-Correct: {results["gpt4_correct"]}, Accuracy: {results["gpt4_correct"] / total * 100:.2f}%')
+    print(
+        f'Total: {total}, GPT-4 NO-ANS (RANDOM): {results["gpt4_failed"]}, Percentage: {results["gpt4_failed"] / total * 100:.2f}%')
+    print(
+        f'Total: {total}, GPT-4-OursVisual-Correct: {results["gpt4_ourvisual_correct"]}, Accuracy: {results["gpt4_ourvisual_correct"] / total * 100:.2f}%')
+    print(
+        f'Total: {total}, Requery-Correct: {results["requery_correct"]}, Accuracy: {results["requery_correct"] / total * 100:.2f}%')
+    print(
+        f'Total: {total}, Correct upper: {results["correct_upperbound"]}, Accuracy: {results["correct_upperbound"] / total * 100:.2f}%')
 
     sqa_results['acc'] = results["requery_correct"] / total * 100
     sqa_results['correct'] = results["requery_correct"]
@@ -146,4 +157,3 @@ print("=====================================")
 
     with open(args.output_result, 'w') as f:
         json.dump(sqa_results, f, indent=2)
-

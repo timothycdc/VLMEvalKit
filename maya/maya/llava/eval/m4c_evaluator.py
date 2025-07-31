@@ -235,7 +235,8 @@ class TextVQAAccuracyEvaluator:
         for unique_answer in unique_answers:
             accs = []
             for gt_answer in gt_answers:
-                other_answers = [item for item in gt_answers if item != gt_answer]
+                other_answers = [
+                    item for item in gt_answers if item != gt_answer]
                 matching_answers = [
                     item for item in other_answers if item[1] == unique_answer
                 ]
@@ -249,7 +250,8 @@ class TextVQAAccuracyEvaluator:
         pred_scores = []
         for entry in tqdm(pred_list):
             pred_answer = self.answer_processor(entry["pred_answer"])
-            unique_answer_scores = self._compute_answer_scores(entry["gt_answers"])
+            unique_answer_scores = self._compute_answer_scores(
+                entry["gt_answers"])
             score = unique_answer_scores.get(pred_answer, 0.0)
             pred_scores.append(score)
 

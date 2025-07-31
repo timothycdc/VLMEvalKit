@@ -12,7 +12,8 @@ def get_args():
     parser.add_argument('--gpt4-result', type=str)
     parser.add_argument('--our-result', type=str)
     parser.add_argument('--split', type=str, default='test')
-    parser.add_argument('--options', type=list, default=["A", "B", "C", "D", "E"])
+    parser.add_argument('--options', type=list,
+                        default=["A", "B", "C", "D", "E"])
     return parser.parse_args()
 
 
@@ -39,7 +40,8 @@ if __name__ == "__main__":
     args = get_args()
 
     base_dir = args.base_dir
-    split_indices = json.load(open(os.path.join(base_dir, "pid_splits.json")))[args.split]
+    split_indices = json.load(
+        open(os.path.join(base_dir, "pid_splits.json")))[args.split]
     problems = json.load(open(os.path.join(base_dir, "problems.json")))
     our_predictions = [json.loads(line) for line in open(args.our_result)]
     our_predictions = {pred['question_id']: pred for pred in our_predictions}
@@ -70,7 +72,8 @@ if __name__ == "__main__":
             gpt4_answer = "FAILED"
 
         our_pred_idx = get_pred_idx(our_answer, prob['choices'], args.options)
-        gpt4_pred_idx = get_pred_idx(gpt4_answer, prob['choices'], args.options)
+        gpt4_pred_idx = get_pred_idx(
+            gpt4_answer, prob['choices'], args.options)
 
         if gpt4_answer == 'FAILED':
             results['gpt4_failed'] += 1
@@ -92,13 +95,14 @@ if __name__ == "__main__":
         else:
             results['incorrect'] += 1
 
-
         if gpt4_pred_idx == prob['answer'] or our_pred_idx == prob['answer']:
             results['correct_upperbound'] += 1
 
     correct = results['correct']
     total = results['correct'] + results['incorrect']
-    print(f'Total: {total}, Correct: {correct}, Accuracy: {correct / total * 100:.2f}%')
-    print(f'Total: {total}, Correct (upper): {results["correct_upperbound"]}, Accuracy: {results["correct_upperbound"] / total * 100:.2f}%')
-    print(f'Total: {total}, GPT-4 NO-ANS (RANDOM): {results["gpt4_failed"]}, Percentage: {results["gpt4_failed"] / total * 100:.2f}%')
-
+    print(
+        f'Total: {total}, Correct: {correct}, Accuracy: {correct / total * 100:.2f}%')
+    print(
+        f'Total: {total}, Correct (upper): {results["correct_upperbound"]}, Accuracy: {results["correct_upperbound"] / total * 100:.2f}%')
+    print(
+        f'Total: {total}, GPT-4 NO-ANS (RANDOM): {results["gpt4_failed"]}, Percentage: {results["gpt4_failed"] / total * 100:.2f}%')

@@ -8,21 +8,24 @@ import torch
 import torch.nn as nn
 
 from transformers import AutoConfig, AutoModelForCausalLM, \
-                         CohereConfig, CohereModel, CohereForCausalLM
+    CohereConfig, CohereModel, CohereForCausalLM
 
 from transformers.modeling_outputs import CausalLMOutputWithPast
 from transformers.generation.utils import GenerateOutput
 
 from ..llava_arch import LlavaMetaModel, LlavaMetaForCausalLM
 
+
 class LlavaCohereConfig(CohereConfig):
     model_type = "llava_cohere"
+
 
 class LlavaCohereModel(LlavaMetaModel, CohereModel):
     config_class = LlavaCohereConfig
 
     def __init__(self, config: CohereConfig):
         super(LlavaCohereModel, self).__init__(config)
+
 
 class LlavaCohereForCausalLM(CohereForCausalLM, LlavaMetaForCausalLM):
     config_class = LlavaCohereConfig
@@ -31,7 +34,8 @@ class LlavaCohereForCausalLM(CohereForCausalLM, LlavaMetaForCausalLM):
         super().__init__(config)
         self.model = LlavaCohereModel(config)
 
-        self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
+        self.lm_head = nn.Linear(
+            config.hidden_size, config.vocab_size, bias=False)
 
         # Initialize weights and apply final processing
         self.post_init()
@@ -139,6 +143,7 @@ class LlavaCohereForCausalLM(CohereForCausalLM, LlavaMetaForCausalLM):
         if image_sizes is not None:
             inputs['image_sizes'] = image_sizes
         return inputs
+
 
 AutoConfig.register("llava_cohere", LlavaCohereConfig)
 AutoModelForCausalLM.register(LlavaCohereConfig, LlavaCohereForCausalLM)

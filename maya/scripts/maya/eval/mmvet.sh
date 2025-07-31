@@ -14,4 +14,3 @@ mkdir -p ./playground/data/eval/mm-vet/results_maya
 python scripts/convert_mmvet_for_eval.py \
     --src ./playground/data/eval/mm-vet/answers/maya_full_ft.jsonl \
     --dst ./playground/data/eval/mm-vet/results_maya/maya_full_ft.json
-

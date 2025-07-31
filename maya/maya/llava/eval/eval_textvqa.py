@@ -36,19 +36,22 @@ def eval_single(annotation_file, result_file):
     experiment_name = os.path.splitext(os.path.basename(result_file))[0]
     print(experiment_name)
     annotations = json.load(open(annotation_file))['data']
-    annotations = {(annotation['image_id'], annotation['question'].lower()): annotation for annotation in annotations}
+    annotations = {(annotation['image_id'], annotation['question'].lower(
+    )): annotation for annotation in annotations}
     results = [json.loads(line) for line in open(result_file)]
 
     pred_list = []
     for result in results:
-        annotation = annotations[(result['question_id'], prompt_processor(result['prompt']))]
+        annotation = annotations[(
+            result['question_id'], prompt_processor(result['prompt']))]
         pred_list.append({
             "pred_answer": result['text'],
             "gt_answers": annotation['answers'],
         })
 
     evaluator = TextVQAAccuracyEvaluator()
-    print('Samples: {}\nAccuracy: {:.2f}%\n'.format(len(pred_list), 100. * evaluator.eval_pred_list(pred_list)))
+    print('Samples: {}\nAccuracy: {:.2f}%\n'.format(
+        len(pred_list), 100. * evaluator.eval_pred_list(pred_list)))
 
 
 if __name__ == "__main__":
@@ -62,4 +65,5 @@ if __name__ == "__main__":
             if not result_file.endswith('.jsonl'):
                 print(f'Skipping {result_file}')
                 continue
-            eval_single(args.annotation_file, os.path.join(args.result_dir, result_file))
+            eval_single(args.annotation_file, os.path.join(
+                args.result_dir, result_file))

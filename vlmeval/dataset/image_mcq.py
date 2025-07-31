@@ -2680,12 +2680,6 @@ class TreeBench(ImageMCQDataset):
 
         return calculate_average_iou(all_boxes, target_boxes)
 
-class CVQA(ImageMCQDataset):
-    @classmethod
-    def supported_datasets(cls):
-        return ['CVQA_LOC', 'CVQA_EN']
-
-
 
 class CVQA(ImageMCQDataset):
 
@@ -2740,6 +2734,3 @@ class CVQA(ImageMCQDataset):
         msgs.append(dict(type='text', value=prompt))
 
         return msgs
-
-
-

@@ -71,8 +71,10 @@ class Conversation:
                 else:
                     ret += role
         elif self.sep_style == SeparatorStyle.LLAMA_2:
-            wrap_sys = lambda msg: f"<<SYS>>\n{msg}\n<</SYS>>\n\n" if len(msg) > 0 else msg
-            wrap_inst = lambda msg: f"[INST] {msg} [/INST]"
+            def wrap_sys(
+                msg): return f"<<SYS>>\n{msg}\n<</SYS>>\n\n" if len(msg) > 0 else msg
+
+            def wrap_inst(msg): return f"[INST] {msg} [/INST]"
             ret = ""
 
             for i, (role, message) in enumerate(messages):
@@ -82,7 +84,8 @@ class Conversation:
                 if message:
                     if type(message) is tuple:
                         message, _, _ = message
-                    if i == 0: message = wrap_sys(self.system) + message
+                    if i == 0:
+                        message = wrap_sys(self.system) + message
                     if i % 2 == 0:
                         message = wrap_inst(message)
                         ret += self.sep + message
@@ -116,11 +119,13 @@ class Conversation:
                 if width == height:
                     return pil_img
                 elif width > height:
-                    result = Image.new(pil_img.mode, (width, width), background_color)
+                    result = Image.new(
+                        pil_img.mode, (width, width), background_color)
                     result.paste(pil_img, (0, (width - height) // 2))
                     return result
                 else:
-                    result = Image.new(pil_img.mode, (height, height), background_color)
+                    result = Image.new(
+                        pil_img.mode, (height, height), background_color)
                     result.paste(pil_img, ((height - width) // 2, 0))
                     return result
             image = expand2square(image)
@@ -129,7 +134,8 @@ class Conversation:
         elif image_process_mode == "Resize":
             image = image.resize((336, 336))
         else:
-            raise ValueError(f"Invalid image_process_mode: {image_process_mode}")
+            raise ValueError(
+                f"Invalid image_process_mode: {image_process_mode}")
         if max(image.size) > max_len:
             max_hw, min_hw = max(image.size), min(image.size)
             aspect_ratio = max_hw / min_hw
@@ -155,7 +161,8 @@ class Conversation:
             if i % 2 == 0:
                 if type(msg) is tuple:
                     msg, image, image_process_mode = msg
-                    image = self.process_image(image, image_process_mode, return_pil=return_pil)
+                    image = self.process_image(
+                        image, image_process_mode, return_pil=return_pil)
                     images.append(image)
         return images
 

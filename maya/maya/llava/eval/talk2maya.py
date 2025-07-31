@@ -1,29 +1,30 @@
 # Global Variables (Model, Tokenizer, Image Processor)
-model_base = "CohereForAI/aya-23-8B"
-model_path = "maya-multimodal/maya" # toxicity-free: nahidalam/maya_toxicity_free_finetuned
-mode = "finetuned"  # Options: 'finetuned' or 'pretrained'
-projector_path = None  # Required if mode is 'pretrained'
-
-import torch
-import os
-from PIL import Image
-import matplotlib.pyplot as plt
-import textwrap
-import argparse
-
+from llava.mm_utils import tokenizer_image_token, process_images
+from llava.utils import disable_torch_init
+from llava.eval.maya.eval_utils import load_maya_model
+from llava.conversation import conv_templates
 from llava.constants import (
     IMAGE_TOKEN_INDEX,
     DEFAULT_IMAGE_TOKEN,
     DEFAULT_IM_START_TOKEN,
     DEFAULT_IM_END_TOKEN,
 )
-from llava.conversation import conv_templates
-from llava.eval.maya.eval_utils import load_maya_model
-from llava.utils import disable_torch_init
-from llava.mm_utils import tokenizer_image_token, process_images
+import argparse
+import textwrap
+import matplotlib.pyplot as plt
+from PIL import Image
+import os
+import torch
+model_base = "CohereForAI/aya-23-8B"
+# toxicity-free: nahidalam/maya_toxicity_free_finetuned
+model_path = "maya-multimodal/maya"
+mode = "finetuned"  # Options: 'finetuned' or 'pretrained'
+projector_path = None  # Required if mode is 'pretrained'
+
 
 # Disable Torch initialization to save memory
 disable_torch_init()
+
 
 def load_model(model_base, model_path, mode="finetuned", projector_path=None):
     """
@@ -34,7 +35,8 @@ def load_model(model_base, model_path, mode="finetuned", projector_path=None):
             "******** Warning: Projector path is provided but will not be used in 'finetuned' mode ********"
         )
     if mode == "pretrained" and projector_path is None:
-        raise ValueError("Error: Projector path is required when mode is 'pretrained'")
+        raise ValueError(
+            "Error: Projector path is required when mode is 'pretrained'")
 
     model, tokenizer, image_processor, _ = load_maya_model(
         model_base, model_path, projector_path if mode == "pretrained" else None, mode
@@ -54,6 +56,7 @@ model, tokenizer, image_processor = load_model(
     mode=mode,
     projector_path=projector_path,
 )
+
 
 def validate_image_file(image_path):
     """
@@ -122,7 +125,8 @@ def run_vqa_model(
     prompt = conv.get_prompt()
 
     input_ids = (
-        tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt")
+        tokenizer_image_token(
+            prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt")
         .unsqueeze(0)
         .cuda()
     )
@@ -130,7 +134,6 @@ def run_vqa_model(
     # Open and process the image
     image = Image.open(image_file).convert("RGB")
     image_tensor = process_images([image], image_processor, model.config)[0]
-
 
     # Generate the answer using the model
     with torch.inference_mode():
@@ -147,7 +150,8 @@ def run_vqa_model(
         )
 
     # Decode the output tokens to a string and wrap text for display
-    answer = tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0].strip()
+    answer = tokenizer.batch_decode(
+        output_ids, skip_special_tokens=True)[0].strip()
     wrapped_answer = textwrap.fill(answer, width=80)  # Adjust width as needed
 
     # Display the question and wrapped answer
@@ -160,8 +164,10 @@ def run_vqa_model(
 
 # Main function to handle argument parsing
 def main():
-    parser = argparse.ArgumentParser(description="Run Visual Question Answering with Maya model.")
-    parser.add_argument("question", type=str, help="The question to ask about the image.")
+    parser = argparse.ArgumentParser(
+        description="Run Visual Question Answering with Maya model.")
+    parser.add_argument("question", type=str,
+                        help="The question to ask about the image.")
     parser.add_argument("image_file", type=str, help="Path to the image file.")
 
     args = parser.parse_args()
@@ -171,6 +177,7 @@ def main():
         question=args.question,
         image_file=args.image_file
     )
+
 
 if __name__ == "__main__":
     main()

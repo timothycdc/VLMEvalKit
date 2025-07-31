@@ -33,4 +33,3 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
 done
 
 python scripts/convert_vqav2_for_submission.py --split $SPLIT --ckpt $CKPT
-

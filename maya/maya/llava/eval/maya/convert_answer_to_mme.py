@@ -3,6 +3,7 @@ import json
 import argparse
 from collections import defaultdict
 
+
 def get_args():
     parser = argparse.ArgumentParser()
 
@@ -12,6 +13,7 @@ def get_args():
 
     args = parser.parse_args()
     return args
+
 
 def get_gt(data_path):
     GT = {}
@@ -35,6 +37,7 @@ def get_gt(data_path):
                 GT[(category, file, question)] = answer
     return GT
 
+
 if __name__ == "__main__":
 
     args = get_args()
@@ -48,7 +51,8 @@ if __name__ == "__main__":
     result_dir = os.path.join('eval_tool', 'answers', experiment)
     os.makedirs(result_dir, exist_ok=True)
 
-    answers = [json.loads(line) for line in open(os.path.join('answers', f'{experiment}.jsonl'))]
+    answers = [json.loads(line) for line in open(
+        os.path.join('answers', f'{experiment}.jsonl'))]
 
     results = defaultdict(list)
     for answer in answers:
@@ -63,11 +67,13 @@ if __name__ == "__main__":
             for file, prompt, answer in cate_tups:
                 original_prompt = prompt  # Keep original prompt for logging
                 if 'Answer the question using a single word or phrase.' in prompt:
-                    prompt = prompt.replace('Answer the question using a single word or phrase.', '').strip()
+                    prompt = prompt.replace(
+                        'Answer the question using a single word or phrase.', '').strip()
                 if 'Please answer yes or no.' not in prompt:
                     prompt = prompt + ' Please answer yes or no.'
                     if (category, file, prompt) not in GT:
-                        prompt = prompt.replace(' Please answer yes or no.', '  Please answer yes or no.')
+                        prompt = prompt.replace(
+                            ' Please answer yes or no.', '  Please answer yes or no.')
                 try:
                     gt_ans = GT[(category, file, prompt)]
                 except KeyError:

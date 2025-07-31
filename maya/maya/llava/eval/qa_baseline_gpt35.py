@@ -13,6 +13,7 @@ import shortuuid
 MODEL = 'gpt-3.5-turbo'
 MODEL_ID = 'gpt-3.5-turbo:20230327'
 
+
 def get_answer(question_id: int, question: str, max_tokens: int):
     ans = {
         'answer_id': shortuuid.uuid(),
@@ -45,7 +46,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ChatGPT answer generation.')
     parser.add_argument('-q', '--question')
     parser.add_argument('-o', '--output')
-    parser.add_argument('--max-tokens', type=int, default=1024, help='maximum number of tokens produced in the output')
+    parser.add_argument('--max-tokens', type=int, default=1024,
+                        help='maximum number of tokens produced in the output')
     args = parser.parse_args()
 
     questions_dict = {}
@@ -61,7 +63,8 @@ if __name__ == '__main__':
     with concurrent.futures.ThreadPoolExecutor(max_workers=32) as executor:
         futures = []
         for qid, question in questions_dict.items():
-            future = executor.submit(get_answer, qid, question, args.max_tokens)
+            future = executor.submit(
+                get_answer, qid, question, args.max_tokens)
             futures.append(future)
 
         for future in tqdm.tqdm(concurrent.futures.as_completed(futures), total=len(futures)):

@@ -2,12 +2,14 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--results_dir', default='../../../playground/data/eval/MME/eval_tool/LaVIN', type=str)
+parser.add_argument(
+    '--results_dir', default='../../../playground/data/eval/MME/eval_tool/LaVIN', type=str)
 
 eval_type_dict = {
     "Perception": ["existence", "count", "position", "color", "posters", "celebrity", "scene", "landmark", "artwork", "OCR"],
     "Cognition": ["commonsense_reasoning", "numerical_calculation", "text_translation", "code_reasoning"]
 }
+
 
 class calculate_metrics:
     def divide_chunks(self, l, n=2):
@@ -36,7 +38,7 @@ class calculate_metrics:
             "no": 0,
             "other": -1
         }
-        
+
         gts = [label_map[x] for x in gts]
         preds = [label_map[x] for x in preds]
 
@@ -46,7 +48,7 @@ class calculate_metrics:
 
         clean_gts = []
         clean_preds = []
-        other_num = 0 
+        other_num = 0
         for gt, pred in zip(gts, preds):
             if pred == -1:
                 other_num += 1
@@ -54,15 +56,21 @@ class calculate_metrics:
             clean_gts.append(gt)
             clean_preds.append(pred)
 
-        tp = sum(1 for gt, pred in zip(clean_gts, clean_preds) if gt == 1 and pred == 1)
-        tn = sum(1 for gt, pred in zip(clean_gts, clean_preds) if gt == 0 and pred == 0)
-        fp = sum(1 for gt, pred in zip(clean_gts, clean_preds) if gt == 0 and pred == 1)
-        fn = sum(1 for gt, pred in zip(clean_gts, clean_preds) if gt == 1 and pred == 0)
+        tp = sum(1 for gt, pred in zip(clean_gts, clean_preds)
+                 if gt == 1 and pred == 1)
+        tn = sum(1 for gt, pred in zip(clean_gts, clean_preds)
+                 if gt == 0 and pred == 0)
+        fp = sum(1 for gt, pred in zip(clean_gts, clean_preds)
+                 if gt == 0 and pred == 1)
+        fn = sum(1 for gt, pred in zip(clean_gts, clean_preds)
+                 if gt == 1 and pred == 0)
 
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0
         recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-        f1 = 2 * (precision * recall) / (precision + recall) if precision + recall > 0 else 0
-        yes_ratio = clean_gts.count(1) / len(clean_gts) if len(clean_gts) > 0 else 0
+        f1 = 2 * (precision * recall) / (precision +
+                                         recall) if precision + recall > 0 else 0
+        yes_ratio = clean_gts.count(
+            1) / len(clean_gts) if len(clean_gts) > 0 else 0
 
         metric_dict = {
             "TP": tp,
@@ -83,10 +91,10 @@ class calculate_metrics:
         model_score_dict = dict()
         all_gts = []
         all_preds = []
-        
+
         for eval_type, task_name_list in eval_type_dict.items():
             print("===========", eval_type, "===========")
-           
+
             scores = 0
             task_score_dict = dict()
 
@@ -94,7 +102,7 @@ class calculate_metrics:
                 task_txt = os.path.join(results_dir, task_name + ".txt")
                 lines = open(task_txt, 'r').readlines()
                 chunk_lines = list(self.divide_chunks(lines))
-                
+
                 img_num = len(chunk_lines)
                 task_other_ans_num = 0
                 task_score = 0
@@ -107,7 +115,8 @@ class calculate_metrics:
                     img_correct_num = 0
 
                     for img_item in img_items:
-                        img_name, question, gt_ans, pred_ans = img_item.split("\t")
+                        img_name, question, gt_ans, pred_ans = img_item.split(
+                            "\t")
 
                         gt_ans = gt_ans.lower()
                         pred_ans = pred_ans.lower()
@@ -121,10 +130,10 @@ class calculate_metrics:
                         preds.append(pred_ans)
                         all_gts.append(gt_ans)
                         all_preds.append(pred_ans)
-                        
+
                         if gt_ans == pred_ans:
                             img_correct_num += 1
-                        
+
                         if pred_ans not in ["yes", "no"]:
                             task_other_ans_num += 1
 
@@ -134,14 +143,14 @@ class calculate_metrics:
                 metric_dict = self.compute_metric(gts, preds)
                 acc_plus = acc_plus_correct_num / img_num
                 metric_dict["acc_plus"] = acc_plus
-                
+
                 print(f"===={task_name}====")
                 for k, v in metric_dict.items():
                     print(f"{k}: {v}")
 
                     if k in ["acc", "acc_plus"]:
                         task_score += v * 100
-                
+
                 task_score_dict[task_name] = task_score
                 scores += task_score
 
@@ -156,7 +165,7 @@ class calculate_metrics:
         print("==== Overall Metrics Across All Responses ====")
         for k, v in overall_metrics.items():
             print(f"{k}: {v}")
-        
+
         return
 
 
